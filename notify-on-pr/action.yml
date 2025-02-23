@@ -1,0 +1,12 @@
+name: 'Notify on Pull Request'
+description: 'Sends a Slack notification when a Pull Request is opened or updated'
+inputs:
+  slack_webhook_url:
+    description: 'Slack Incoming Webhook URL'
+    required: true
+  github_token:
+    description: 'GitHub Token for fetching PR details'
+    required: true
+runs:
+  using: 'node16'
+  main: 'index.js'
