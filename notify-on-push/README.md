@@ -1,61 +1,62 @@
-# 푸시 알림 액션
+# Notify on Pull Request Action
 
-이 리포지토리는 GitHub에서 `push` 이벤트가 발생할 때 Slack으로 알림을 보내는 GitHub Action을 제공합니다.
+This repository provides a GitHub Action that sends notifications to Slack when a Pull Request event occurs.
 
-## 특징
+## Features
 
-- 새로운 푸시 이벤트 시 지정된 Slack 채널로 알림을 전송합니다.
-- 리포지토리 이름, 푸시한 사용자, 커밋 수를 표시합니다.
-- GitHub Actions 워크플로우에 쉽게 통합할 수 있습니다.
+- Sends notifications to a specified Slack channel when a Pull Request is opened or updated.
+- Displays the title, author, and state of the Pull Request.
+- Easy to integrate with GitHub Actions workflows.
 
 ---
 
-## 사용법
+## How to Use
 
-### 1. 워크플로우 설정하기
+### 1. Set Up the Workflow
 
-`.github/workflows/notify.yml` 파일을 생성하고 다음 설정을 추가하세요:
+Create a `.github/workflows/notify.yml` file with the following configuration:
 
 ```yaml
-name: 푸시 시 슬랙 알림
+name: Pull Request Notification
 
 on:
-  push:
-    branches:
-      - main  # 필요한 브랜치를 지정할 수 있습니다.
+  pull_request:
+    - types: [opened, edited, reopened]
 
 jobs:
   notify:
     runs-on: ubuntu-latest
     steps:
-      - name: 푸시 알림 보내기
-        uses: your-username/notify-on-push-action@v1
+      - name: Notify on PR
+        uses: your-username/notify-on-pr@v1
         with:
           slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
 ```
 
-2. Slack Webhook URL 설정하기
-	1.	Slack 앱 생성
-	•	Slack API 페이지로 이동하여 “Create New App”을 클릭합니다.
-	•	“From scratch”를 선택하고 앱 이름을 입력한 후 워크스페이스를 선택합니다.
-	2.	Incoming Webhooks 활성화
-	•	“Incoming Webhooks” 메뉴로 이동하여 스위치를 활성화합니다.
-	•	“Add New Webhook to Workspace”를 클릭하고 알림을 보낼 채널을 선택한 후 “Allow”를 클릭합니다.
-	•	생성된 Webhook URL을 복사합니다.
-	3.	GitHub Secrets에 Webhook URL 추가
-	•	GitHub 리포지토리 설정에서 Settings > Secrets and variables > Actions로 이동합니다.
-	•	“New repository secret”을 클릭하고 SLACK_WEBHOOK_URL이라는 이름으로 Webhook URL을 추가합니다.
+### 2. Set Up the Slack Webhook URL
 
-예제 메시지
+1. Create a Slack App
+   - Go to the Slack API page and click “Create New App.”
+   - Select “From scratch” and enter your app name. Choose the workspace.
+2. Enable Incoming Webhooks
+   - Navigate to “Incoming Webhooks” and enable the feature.
+   - Click “Add New Webhook to Workspace” and select a channel. Click “Allow.”
+   - Copy the generated Webhook URL.
+3. Add the Webhook URL to GitHub Secrets
+   - Go to Settings > Secrets and variables > Actions in your GitHub repository.
+   - Click “New repository secret,” name it SLACK_WEBHOOK_URL, and paste the Webhook URL.
 
-푸시 이벤트 발생 시 Slack에 다음과 같은 메시지가 전송됩니다:
+Example Message
 
-🎉 *New push to your-repo-name* 🎉
-- Pusher: developjik
-- Commit count: 3
-- [View Repository](https://github.com/your-repo-url)
+When a Pull Request event occurs, the following message will be sent to Slack:
 
-라이선스
+📢 _Pull Request Alert_ 📢
+🔹 _Title:_ PR Title
+🔹 _Author:_ PR Author
+🔹 _State:_ PR State
+🔹 [View PR](PR Link)
 
-MIT License로 배포됩니다.
+License
 
+Distributed under the MIT License.

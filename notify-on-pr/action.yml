@@ -1,9 +1,18 @@
 name: 'Notify on Pull Request'
-description: 'Sends a Slack notification when a Pull Request is opened or updated'
+description: 'Sends notifications when a Pull Request is opened or updated'
 inputs:
   slack_webhook_url:
     description: 'Slack Incoming Webhook URL'
-    required: true
+    required: false
+  discord_webhook_url:
+    description: 'Discord Incoming Webhook URL'
+    required: false
+  telegram_bot_token:
+    description: 'Telegram Bot Token'
+    required: false
+  telegram_chat_id:
+    description: 'Telegram Chat ID (Required if using Telegram notifications)'
+    required: false
   github_token:
     description: 'GitHub Token for fetching PR details'
     required: true

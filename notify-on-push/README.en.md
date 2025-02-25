@@ -29,7 +29,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Notify on Push
-        uses: your-username/notify-on-push-action@v1
+        uses: developjik/notify-on-push-action@v1
         with:
           slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
 
