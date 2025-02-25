@@ -1,0 +1,12 @@
+name: 'Notify on Workflow Failure'
+description: 'Sends a Slack notification when a GitHub Actions workflow fails'
+inputs:
+  slack_webhook_url:
+    description: 'Slack Incoming Webhook URL'
+    required: true
+  job_name:
+    description: 'Name of the failed job'
+    required: true
+runs:
+  using: 'node16'
+  main: 'index.js'
