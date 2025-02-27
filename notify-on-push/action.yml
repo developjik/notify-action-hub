@@ -1,12 +1,21 @@
 name: 'Notify on Push Action'
-description: 'Sends a Slack message when a git push occurs'
+description: 'Sends a notification when a git push occurs'
 author: 'developjik'
 
 inputs:
   slack_webhook_url:
     description: 'Slack Incoming Webhook URL'
-    required: true
+    required: false
+  discord_webhook_url:
+    description: 'Discord Incoming Webhook URL'
+    required: false
+  telegram_bot_token:
+    description: 'Telegram Bot Token'
+    required: false
+  telegram_chat_id:
+    description: 'Telegram Chat ID'
+    required: false
 
 runs:
-  using: 'node12'
+  using: 'node16'
   main: 'index.js'

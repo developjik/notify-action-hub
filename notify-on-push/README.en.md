@@ -60,5 +60,4 @@ Distributed under the MIT License.
 
 ---
 
-이제 `README.md`는 기본 한글로 제공되고, 영어 설명은 `README.en.md`로 링크할 수 있어! 😄
 ```
