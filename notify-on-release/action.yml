@@ -1,0 +1,18 @@
+name: 'Notify on Release'
+description: 'Sends a notification to Slack, Discord, or Telegram when a new release is published'
+inputs:
+  slack_webhook_url:
+    description: 'Slack Incoming Webhook URL'
+    required: false
+  discord_webhook_url:
+    description: 'Discord Webhook URL'
+    required: false
+  telegram_bot_token:
+    description: 'Telegram Bot Token'
+    required: false
+  telegram_chat_id:
+    description: 'Telegram Chat ID'
+    required: false
+runs:
+  using: 'node16'
+  main: 'index.js'
