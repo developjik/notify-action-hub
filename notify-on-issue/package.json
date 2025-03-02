@@ -1,0 +1,11 @@
+{
+  "name": "notify-on-issue",
+  "version": "1.0.0",
+  "description": "GitHub Action for notifying Slack on issue events",
+  "main": "index.js",
+  "dependencies": {
+    "@actions/core": "^1.10.0",
+    "@actions/github": "^5.0.0",
+    "axios": "^1.6.0"
+  }
+}

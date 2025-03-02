@@ -1,0 +1,18 @@
+name: 'Notify on Issue'
+description: 'Sends notifications when an issue is opened or updated on Slack, Discord, and Telegram'
+inputs:
+  slack_webhook_url:
+    description: 'Slack Incoming Webhook URL'
+    required: false
+  discord_webhook_url:
+    description: 'Discord Webhook URL'
+    required: false
+  telegram_bot_token:
+    description: 'Telegram Bot Token'
+    required: false
+  telegram_chat_id:
+    description: 'Telegram Chat ID'
+    required: false
+runs:
+  using: 'node16'
+  main: 'index.js'
