@@ -1,0 +1,11 @@
+{
+  "name": "notify-on-branch-delete",
+  "version": "1.0.0",
+  "description": "GitHub Action for notifying Slack on branch delete events",
+  "main": "index.js",
+  "dependencies": {
+    "@actions/core": "^1.11.1",
+    "@actions/github": "^6.0.0",
+    "axios": "^1.7.9"
+  }
+}
