@@ -29,7 +29,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: 푸시 알림 보내기
-        uses: developjik/notify-on-push-action@v1
+        uses: developjik/notify-action-hub/notify-on-push-action@v1
         with:
           slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
 ```

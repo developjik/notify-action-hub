@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: PR 알림 보내기
-        uses: developjik/notify-action-hub/notify-on-pr@v1
+        uses: developjik/notify-action-hub/notify-action-hub/notify-on-pr@v1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}

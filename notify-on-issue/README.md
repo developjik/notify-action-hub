@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: 이슈 알림 보내기
-        uses: developjik/issue-notify@v1
+        uses: developjik/notify-action-hub/notify-action-hub/issue-notify@v1
         with:
           slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
           discord_webhook_url: ${{ secrets.DISCORD_WEBHOOK_URL }}
