@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Send branch delete notification
-        uses: developjik/notify-on-branch-delete@v1
+        uses: developjik/notify-action-hub/notify-on-branch-delete@v1
         with:
           slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
           discord_webhook_url: ${{ secrets.DISCORD_WEBHOOK_URL }}
