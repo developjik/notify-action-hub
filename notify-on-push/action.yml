@@ -1,21 +1,66 @@
+# GitHub Action의 이름: 이 액션의 식별자로 Marketplace나 워크플로우에서 표시됨
 name: 'Notify on Push Action'
+
+# 액션의 설명: 사용자에게 이 액션이 어떤 역할을 하는지 간략히 설명
 description: 'Sends a notification when a git push occurs'
+
+# 개발자 정보: 이 액션을 만든 사람이나 조직의 이름
 author: 'developjik'
 
+# 액션이 사용할 입력값(inputs) 정의: 사용자가 워크플로우에서 설정할 수 있는 변수들
 inputs:
+  # Slack 알림을 위한 웹훅 URL
   slack_webhook_url:
-    description: 'Slack Incoming Webhook URL'
-    required: false
-  discord_webhook_url:
-    description: 'Discord Incoming Webhook URL'
-    required: false
-  telegram_bot_token:
-    description: 'Telegram Bot Token'
-    required: false
-  telegram_chat_id:
-    description: 'Telegram Chat ID'
-    required: false
+    description: 'Slack Incoming Webhook URL' # Slack에서 제공하는 고유 URL로, 메시지를 보낼 채널 지정
+    required:
+      false # 필수 입력값 아님; 없어도 동작 가능
+      # 하나 이상의 알림 방법(Slack, Discord, Telegram)이 필요함
 
+  # Discord 알림을 위한 웹훅 URL
+  discord_webhook_url:
+    description: 'Discord Incoming Webhook URL' # Discord 서버의 특정 채널로 메시지를 보내는 URL
+    required: false # 필수 아님; 다른 알림 방법과 조합 가능
+
+  # Telegram 알림을 위한 봇 토큰
+  telegram_bot_token:
+    description: 'Telegram Bot Token' # Telegram BotFather에서 생성한 봇의 인증 토큰
+    required: false # 필수 아님; chat_id와 함께 사용해야 함
+
+  # Telegram 알림을 보낼 채팅 ID
+  telegram_chat_id:
+    description: 'Telegram Chat ID' # 메시지를 받을 Telegram 채팅의 고유 ID (개인/그룹)
+    required: false # 필수 아님; bot_token과 함께 설정 필요
+
+  # 커밋 상세 링크 포함 여부
+  include_diff_links:
+    description: 'Include commit diff links in the notification (true/false)' # 커밋 메시지에 변경 내용 링크 추가 여부
+    required: false # 필수 아님
+    default: 'true' # 기본값 true: 링크 포함
+
+  # 알림을 보낼 시간 범위 설정
+  notify_time_range:
+    description: 'Time range to send notifications (e.g., 09:00-17:00 UTC)' # UTC 기준 알림 전송 허용 시간 (형식: HH:MM-HH:MM)
+    required: false # 필수 아님; 설정하지 않으면 시간 제한 없음
+
+  # 알림을 트리거할 최소 커밋 수
+  min_commit_count:
+    description: 'Minimum number of commits to trigger notification' # 알림을 보내기 위한 최소 커밋 수
+    required: false # 필수 아님
+    default: '1' # 기본값 1: 1개 이상 커밋 시 알림
+
+  # 푸시 이벤트를 모아서 보내는 배치 간격
+  batch_interval:
+    description: 'Time interval in minutes to batch notifications (e.g., 5)' # 푸시를 모아 일정 시간 후 전송 (분 단위)
+    required: false # 필수 아님
+    default: '0' # 기본값 0: 즉시 전송 (배치 비활성화)
+
+  # 커밋 품질 점수 표시 여부
+  show_quality_score:
+    description: 'Show a quality score for commits (true/false)' # 커밋 품질 점수(메시지 길이, 변경 파일 수 기준)를 표시
+    required: false # 필수 아님
+    default: 'false' # 기본값 false: 점수 표시 안 함
+
+# 액션 실행 방식 정의
 runs:
-  using: 'node16'
-  main: 'index.js'
+  using: 'node16' # 실행 환경: Node.js 16 버전 사용
+  main: 'index.js' # 실행할 메인 스크립트 파일: index.js에서 로직 처리
