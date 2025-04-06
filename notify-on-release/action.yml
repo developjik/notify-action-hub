@@ -13,6 +13,7 @@ inputs:
   telegram_chat_id:
     description: 'Telegram Chat ID'
     required: false
-runs:
-  using: 'node16'
-  main: 'index.js'
+  runs:
+    using: 'node16'
+    pre: 'npm install'
+    main: 'index.js'

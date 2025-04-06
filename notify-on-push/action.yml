@@ -62,5 +62,7 @@ inputs:
 
 # 액션 실행 방식 정의
 runs:
-  using: 'node16' # 실행 환경: Node.js 16 버전 사용
+  using: 'node16' # 실행 환경: Node.js 16 버전 사용'
+  pre: 'npm install'  # 실행 전에 의존성 설치
   main: 'index.js' # 실행할 메인 스크립트 파일: index.js에서 로직 처리
+

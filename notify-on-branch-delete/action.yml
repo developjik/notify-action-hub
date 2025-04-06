@@ -17,4 +17,5 @@ inputs:
 
 runs:
   using: 'node16'
+  pre: 'npm install'
   main: 'index.js'
