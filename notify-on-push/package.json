@@ -3,9 +3,13 @@
   "version": "1.0.0",
   "description": "GitHub Action for notifying Slack on push events",
   "main": "index.js",
+  "scripts": {
+    "build": "ncc build index.js -o dist"
+  },
   "dependencies": {
     "@actions/core": "^1.11.1",
     "@actions/github": "^6.0.0",
+    "@vercel/ncc": "^0.38.3",
     "axios": "^1.7.9"
   }
 }
