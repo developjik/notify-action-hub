@@ -17,6 +17,5 @@ inputs:
     description: 'GitHub Token for fetching PR details'
     required: true
 runs:
-  using: 'node16'
-  pre: 'npm install'
-  main: 'index.js'
+  using: 'node20'
+  main: 'dist/index.js'
