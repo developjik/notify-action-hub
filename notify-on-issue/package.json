@@ -2,7 +2,7 @@
   "name": "notify-on-issue",
   "version": "1.0.0",
   "description": "GitHub Action for notifying Slack on issue events",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
     "build": "ncc build index.js -o dist"
   },
@@ -11,5 +11,8 @@
     "@actions/github": "^5.0.0",
     "@vercel/ncc": "^0.38.3",
     "axios": "^1.6.0"
+  },
+  "engines": {
+    "node": ">=20"
   }
 }
