@@ -14,6 +14,13 @@ A collection of GitHub Actions for sending notifications about GitHub events to 
   - ❌ Workflow failures
   - 🗑️ Branch deletions
 
+
+## 🧱 Technical Standards
+
+- All actions run on `runs.using: node20`.
+- Execution entry points in `action.yml` are standardized to `dist/index.js`.
+- Release artifacts use `ncc` bundles and commit generated `dist/` output.
+
 ## 🔧 Setup Guide
 
 ### Slack Webhook Setup
