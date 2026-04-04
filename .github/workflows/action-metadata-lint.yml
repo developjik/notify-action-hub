@@ -1,0 +1,36 @@
+name: Validate Action Metadata
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  action-metadata:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run actionlint
+        uses: reviewdog/actionlint@v1
+
+      - name: Verify action runtime and entrypoint convention
+        run: |
+          set -euo pipefail
+          failed=0
+          while IFS= read -r action_file; do
+            if ! grep -Eq "^[[:space:]]*using:[[:space:]]*'node20'[[:space:]]*$" "$action_file"; then
+              echo "[ERROR] $action_file must set runs.using to 'node20'"
+              failed=1
+            fi
+            if ! grep -Eq "^[[:space:]]*main:[[:space:]]*'dist/index.js'[[:space:]]*$" "$action_file"; then
+              echo "[ERROR] $action_file must set runs.main to 'dist/index.js'"
+              failed=1
+            fi
+          done < <(find . -mindepth 2 -maxdepth 2 -type f -name action.yml | sort)
+
+          if [ "$failed" -ne 0 ]; then
+            exit 1
+          fi
