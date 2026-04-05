@@ -19,6 +19,7 @@ A collection of GitHub Actions for sending notifications about GitHub events to 
 
 - All actions run on `runs.using: node20`.
 - Execution entry points in `action.yml` are standardized to `dist/index.js`.
+- `.github/workflows/metadata-lint.yml` checks metadata consistency in CI using `scripts/validate-action-metadata.sh` + `actionlint`.
 - Release artifacts use `ncc` bundles and commit generated `dist/` output.
 
 ## 🔧 Setup Guide
