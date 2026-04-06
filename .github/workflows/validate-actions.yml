@@ -1,0 +1,20 @@
+name: Validate Actions
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run actionlint
+        uses: rhysd/actionlint@v1
+
+      - name: Validate action metadata conventions
+        run: ./scripts/validate-actions.sh

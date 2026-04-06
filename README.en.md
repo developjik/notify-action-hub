@@ -20,6 +20,7 @@ A collection of GitHub Actions for sending notifications about GitHub events to 
 - All actions run on `runs.using: node20`.
 - Execution entry points in `action.yml` are standardized to `dist/index.js`.
 - Release artifacts use `ncc` bundles and commit generated `dist/` output.
+- CI enforces metadata conventions (`node20`, `dist/index.js`) using `actionlint` + `scripts/validate-actions.sh`.
 
 ## 🔧 Setup Guide
 

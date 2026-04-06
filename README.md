@@ -20,6 +20,7 @@ GitHub 이벤트에 대한 알림을 다양한 플랫폼으로 전송하는 GitH
 - 모든 액션은 `runs.using: node20` 기준으로 동작합니다.
 - `action.yml`의 실행 엔트리는 `dist/index.js`로 통일되어 있습니다.
 - 배포 시 `ncc`로 번들된 `dist/` 산출물을 함께 커밋하는 방식을 사용합니다.
+- CI에서 `actionlint` + `scripts/validate-actions.sh`를 통해 메타데이터 규칙(`node20`, `dist/index.js`)을 자동 검증합니다.
 
 ## 🔧 설정 방법
 
