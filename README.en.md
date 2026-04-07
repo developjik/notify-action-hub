@@ -20,6 +20,13 @@ A collection of GitHub Actions for sending notifications about GitHub events to 
 - All actions run on `runs.using: node20`.
 - Execution entry points in `action.yml` are standardized to `dist/index.js`.
 - Release artifacts use `ncc` bundles and commit generated `dist/` output.
+- Metadata consistency is automatically validated in `.github/workflows/metadata-consistency.yml` on PRs and pushes to `main`.
+
+You can run the same check locally with:
+
+```bash
+bash scripts/validate-actions-metadata.sh
+```
 
 ## 🔧 Setup Guide
 

@@ -1,0 +1,15 @@
+name: Metadata Consistency
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  validate-action-metadata:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate action.yml runtime and dist entry
+        run: bash scripts/validate-actions-metadata.sh
