@@ -20,6 +20,13 @@ GitHub 이벤트에 대한 알림을 다양한 플랫폼으로 전송하는 GitH
 - 모든 액션은 `runs.using: node20` 기준으로 동작합니다.
 - `action.yml`의 실행 엔트리는 `dist/index.js`로 통일되어 있습니다.
 - 배포 시 `ncc`로 번들된 `dist/` 산출물을 함께 커밋하는 방식을 사용합니다.
+- PR/메인 브랜치 푸시 시 `.github/workflows/metadata-consistency.yml`에서 메타데이터 정합성을 자동 검증합니다.
+
+로컬에서도 아래 명령으로 동일 검증을 실행할 수 있습니다.
+
+```bash
+bash scripts/validate-actions-metadata.sh
+```
 
 ## 🔧 설정 방법
 
