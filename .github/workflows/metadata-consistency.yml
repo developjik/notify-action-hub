@@ -13,3 +13,10 @@ jobs:
       - uses: actions/checkout@v4
       - name: Validate action.yml runtime and dist entry
         run: bash scripts/validate-actions-metadata.sh
+
+  actionlint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run actionlint
+        uses: rhysd/actionlint@v1
