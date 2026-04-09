@@ -1,0 +1,22 @@
+name: Metadata Lint
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  validate-metadata:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run repository metadata checks
+        run: ./scripts/validate-action-metadata.sh
+
+      - name: actionlint
+        uses: reviewdog/actionlint@v1
+        with:
+          fail_on_error: true
