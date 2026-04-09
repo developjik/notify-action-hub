@@ -16,6 +16,10 @@ inputs:
   github_token:
     description: 'GitHub Token for fetching PR details'
     required: true
+branding:
+  icon: 'bell'
+  color: 'blue'
+
 runs:
   using: 'node20'
   main: 'dist/index.js'
