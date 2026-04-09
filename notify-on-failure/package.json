@@ -1,7 +1,7 @@
 {
   "name": "notify-on-failure",
   "version": "1.0.0",
-  "description": "GitHub Action for notifying Slack on push events",
+  "description": "GitHub Action for notifying Slack on workflow failure events",
   "main": "dist/index.js",
   "scripts": {
     "build": "ncc build index.js -o dist"
