@@ -5,11 +5,11 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT_DIR"
 
 fail() {
-  echo "❌ $1" >&2
+  echo "[FAIL] $1" >&2
   exit 1
 }
 
-echo "🔎 Validating action metadata..."
+echo "Validating action metadata..."
 
 mapfile -t action_files < <(find . -mindepth 2 -maxdepth 2 -name action.yml | sort)
 [[ ${#action_files[@]} -gt 0 ]] || fail "No action.yml files found"
@@ -26,4 +26,4 @@ for file in "${action_files[@]}"; do
   [[ -f "$dir/dist/index.js" ]] || fail "$dir/dist/index.js is missing"
 done
 
-echo "✅ Metadata validation passed"
+echo "Metadata validation passed"

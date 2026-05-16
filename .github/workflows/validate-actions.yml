@@ -16,8 +16,16 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Install actionlint
+        run: |
+          curl -sSL \
+            https://github.com/rhysd/actionlint/releases/download/v1.7.12/actionlint_1.7.12_linux_amd64.tar.gz \
+            -o actionlint.tar.gz
+          tar -xzf actionlint.tar.gz actionlint
+          sudo mv actionlint /usr/local/bin/actionlint
+
       - name: Run actionlint
-        uses: rhysd/actionlint@v1
+        run: actionlint
 
   metadata:
     runs-on: ubuntu-latest
