@@ -16,6 +16,10 @@ inputs:
   job_name:
     description: 'Name of the failed job'
     required: false
+branding:
+  icon: 'bell'
+  color: 'blue'
+
 runs:
   using: 'node20'
   main: 'dist/index.js' 

@@ -15,6 +15,10 @@ inputs:
     description: 'Telegram Chat ID'
     required: false
 
+branding:
+  icon: 'bell'
+  color: 'blue'
+
 runs:
   using: 'node20'
   main: 'dist/index.js'
