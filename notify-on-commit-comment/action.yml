@@ -13,6 +13,20 @@ inputs:
   telegram_chat_id:
     description: 'Telegram Chat ID'
     required: false
+  dry_run:
+    description: 'Log the payload instead of actually sending it (true/false)'
+    required: false
+    default: 'false'
+  message_prefix:
+    description: 'Prefix prepended to the notification message (e.g., project name)'
+    required: false
+
+outputs:
+  notification_status:
+    description: 'Notification result: sent, partial, failed, dry-run, or skipped'
+  failed_platforms:
+    description: 'Comma-separated list of platforms that failed (empty if none)'
+
 branding:
   icon: 'bell'
   color: 'blue'

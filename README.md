@@ -1,5 +1,7 @@
 # 🔔 GitHub 알림 액션 허브
 
+[![문서 사이트](https://img.shields.io/badge/문서_사이트-GitHub_Pages-blue)](https://developjik.github.io/notify-action-hub/)
+
 GitHub 이벤트에 대한 알림을 다양한 플랫폼으로 전송하는 GitHub Actions 모음입니다.
 
 ## 🌟 주요 기능
@@ -14,18 +16,24 @@ GitHub 이벤트에 대한 알림을 다양한 플랫폼으로 전송하는 GitH
   - ❌ 워크플로우 실패
   - 🗑️ 브랜치 삭제
 
-
 ## 🧱 기술 표준
 
 - 모든 액션은 `runs.using: node20` 기준으로 동작합니다.
 - `action.yml`의 실행 엔트리는 `dist/index.js`로 통일되어 있습니다.
+- 저장소 루트가 npm 워크스페이스(`common` + `notify-on-*`)이며, 디펜던시는 단일 루트 `package-lock.json`으로 관리합니다.
 - 배포 시 `ncc`로 번들된 `dist/` 산출물을 함께 커밋하는 방식을 사용합니다.
-- PR/메인 브랜치 푸시 시 `.github/workflows/metadata-consistency.yml`에서 메타데이터 정합성과 워크플로 구문(`actionlint`)을 자동 검증합니다.
+- PR/메인 브랜치 푸시 시 `.github/workflows/validate-actions.yml`에서 워크플로 구문(`actionlint`), 메타데이터 정합성, 단위 테스트(vitest), 린트(ESLint/Prettier), dist 신선도를 자동 검증합니다.
 
 로컬에서도 아래 명령으로 동일 검증을 실행할 수 있습니다.
 
 ```bash
-bash scripts/validate-actions-metadata.sh
+npm ci                  # 의존성 설치 (단일 루트 lock)
+npm test                # 단위 테스트 (vitest)
+npm run lint            # ESLint
+npm run format:check    # Prettier 검사
+bash scripts/validate-actions.sh   # action.yml 메타데이터 검사
+bash scripts/check-dist.sh         # dist 신선도 검사
+npm run build:all       # 소스 수정 후 전체 dist 재빌드
 ```
 
 ## 🔧 설정 방법

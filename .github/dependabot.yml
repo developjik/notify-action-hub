@@ -1,0 +1,42 @@
+version: 2
+updates:
+  # GitHub Actions 버전 관리 (워크플로우의 uses: 액션들) — 주간
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+
+  # npm 디펜던시 — 월간
+  # 루트 워크스페이스 + 7개 액션 디렉터리 (단일 루트 lock 파일 사용)
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: monthly
+  - package-ecosystem: npm
+    directory: /notify-on-branch-delete
+    schedule:
+      interval: monthly
+  - package-ecosystem: npm
+    directory: /notify-on-commit-comment
+    schedule:
+      interval: monthly
+  - package-ecosystem: npm
+    directory: /notify-on-failure
+    schedule:
+      interval: monthly
+  - package-ecosystem: npm
+    directory: /notify-on-issue
+    schedule:
+      interval: monthly
+  - package-ecosystem: npm
+    directory: /notify-on-pr
+    schedule:
+      interval: monthly
+  - package-ecosystem: npm
+    directory: /notify-on-push
+    schedule:
+      interval: monthly
+  - package-ecosystem: npm
+    directory: /notify-on-release
+    schedule:
+      interval: monthly

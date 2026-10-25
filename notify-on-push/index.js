@@ -2,59 +2,57 @@
 const core = require('@actions/core');
 // GitHub 이벤트 데이터(예: 푸시 이벤트의 페이로드)에 접근할 수 있는 모듈
 const github = require('@actions/github');
-// HTTP 요청을 보내기 위한 라이브러리(알림 전송에 사용)
-const axios = require('axios');
 // 파일 시스템 작업(비동기)을 위한 모듈; 배치 데이터를 파일로 저장/읽기 위해 사용
 const fs = require('fs').promises;
+// 공통 알림 모듈: 입력 파싱·플랫폼 검증·전송·이스케이프·실패 격리를 제공 (ncc로 함께 번들링됨)
+const {
+  getNotificationInputs,
+  validateNotificationPlatforms,
+  notifyAll,
+  escapeForSlack,
+  escapeForDiscord,
+  escapeForTelegram,
+  setSkippedOutputs,
+  formatMessageWithPrefix,
+} = require('../common/notify');
+// 푸시 액션 전용 순수 헬퍼: 시간대 게이팅·커밋 수 게이트·파일 요약·품질 점수 (ncc로 함께 번들링됨)
+const {
+  isWithinTimeRange,
+  meetsMinCommitCount,
+  buildFileSummary,
+  calculateQualityScore,
+} = require('./lib');
 
 // 메인 실행 함수: 비동기로 동작하며, 푸시 이벤트 처리 및 알림 전송을 담당
 async function run() {
   try {
     // --- 입력값 가져오기 ---
-    // action.yml에서 정의된 입력값을 가져옴
-    const slackWebhookUrl = core.getInput('slack_webhook_url'); // Slack 알림을 위한 웹훅 URL
-    const discordWebhookUrl = core.getInput('discord_webhook_url'); // Discord 알림을 위한 웹훅 URL
-    const telegramBotToken = core.getInput('telegram_bot_token'); // Telegram 봇 토큰
-    const telegramChatId = core.getInput('telegram_chat_id'); // Telegram 채팅 ID
+    // 알림 플랫폼 입력값은 공통 모듈에서 파싱 (웹훅/토큰은 setSecret로 마스킹됨)
+    const inputs = getNotificationInputs();
+    // action.yml에서 정의된 푸시 전용 입력값을 가져옴
     const includeDiffLinks = core.getInput('include_diff_links') !== 'false'; // 커밋 diff 링크 포함 여부 (기본값 true)
     const notifyTimeRange = core.getInput('notify_time_range'); // 알림 전송 허용 시간 범위 (예: "09:00-17:00 UTC")
     const minCommitCount = parseInt(core.getInput('min_commit_count')) || 1; // 최소 커밋 수 (기본값 1)
     const batchInterval = parseInt(core.getInput('batch_interval')) || 0; // 배치 간격(분 단위, 기본값 0=즉시 전송)
     const showQualityScore = core.getInput('show_quality_score') === 'true'; // 품질 점수 표시 여부 (기본값 false)
+    const messagePrefix = core.getInput('message_prefix'); // 알림 메시지 접두사 (기본값 없음)
 
     // --- 최소 조건 확인 ---
-    // 적어도 하나의 알림 방법(Slack, Discord, Telegram)이 설정되어야 함
-    if (!slackWebhookUrl && !discordWebhookUrl && !telegramBotToken) {
-      // 조건 불충족 시 워크플로우 실패 처리
-      core.setFailed(
-        'At least one notification method (Slack, Discord, or Telegram) must be provided.'
-      );
-      return; // 함수 종료
+    // 적어도 하나의 알림 방법(Slack, Discord, Telegram)이 설정되어야 함 (전송 이전에 검증)
+    const platformError = validateNotificationPlatforms(inputs);
+    if (platformError) {
+      setSkippedOutputs();
+      core.setFailed(platformError);
+      return;
     }
 
     // --- 시간대 제한 확인 ---
-    // notify_time_range가 설정된 경우, 현재 시간이 허용 범위 내인지 확인
-    if (notifyTimeRange) {
-      // "HH:MM-HH:MM" 형식의 문자열을 시작/종료 시간으로 분리
-      const [start, end] = notifyTimeRange.split('-').map((t) => t.trim());
-      const now = new Date(); // 현재 UTC 시간
-      const [startHour, startMin] = start.split(':').map(Number); // 시작 시간(시:분)을 숫자로 변환
-      const [endHour, endMin] = end.split(':').map(Number); // 종료 시간(시:분)을 숫자로 변환
-      const currentHour = now.getUTCHours(); // 현재 시간(시)
-      const currentMin = now.getUTCMinutes(); // 현재 시간(분)
-
-      // 시간을 분 단위로 변환하여 비교
-      const startTime = startHour * 60 + startMin; // 시작 시간(분)
-      const endTime = endHour * 60 + endMin; // 종료 시간(분)
-      const currentTime = currentHour * 60 + currentMin; // 현재 시간(분)
-
-      // 현재 시간이 범위 밖이면 알림 스킵
-      if (currentTime < startTime || currentTime > endTime) {
-        core.info(
-          `Notification skipped: outside time range (${notifyTimeRange})`
-        );
-        return;
-      }
+    // notify_time_range가 설정된 경우, 현재 UTC 시간이 허용 범위 내인지 확인
+    // (자정을 걸치는 범위 예: "23:00-06:00" 도 lib에서 지원)
+    if (notifyTimeRange && !isWithinTimeRange(notifyTimeRange)) {
+      setSkippedOutputs();
+      core.info(`Notification skipped: outside time range (${notifyTimeRange})`);
+      return;
     }
 
     // --- 배치 처리 ---
@@ -64,7 +62,7 @@ async function run() {
     try {
       // 기존 배치 파일이 있으면 읽어서 데이터 복원
       batchedData = JSON.parse(await fs.readFile(batchFile, 'utf8'));
-    } catch (e) {
+    } catch {
       // 파일이 없거나 오류 시 새로 생성(초기값 유지)
     }
 
@@ -81,19 +79,22 @@ async function run() {
       if (timeSinceLastSent < batchInterval) {
         // 파일에 배치 데이터 저장 후 종료
         await fs.writeFile(batchFile, JSON.stringify(batchedData));
+        setSkippedOutputs();
         core.info(`Event batched. Waiting for ${batchInterval} minutes.`);
         return;
       }
     }
 
-    // --- 메시지 생성 ---
-    let messageText, slackPayload, discordPayload; // 각 플랫폼별 메시지 변수
+    // --- 메시지 생성 준비 ---
     let allCommits = [], // 배치된 모든 커밋을 저장할 배열
       fileSummary = '', // 파일 변경 요약 문자열
       qualityScore = 0; // 품질 점수
+    // 배치된 푸시 이벤트 수 (메시지 복수형 표기에 사용; 아래에서 배치 초기화 전에 캡처)
+    const eventCount = batchedData.events.length;
+    const hasCommits = eventCount > 0; // 실질적으로 항상 true (위에서 방금 이벤트를 추가함)
 
     // 배치된 이벤트가 있는 경우 처리
-    if (batchedData.events.length > 0) {
+    if (hasCommits) {
       // 모든 이벤트에서 커밋을 합침
       batchedData.events.forEach((event) => {
         if (event.commits && event.commits.length > 0) {
@@ -102,24 +103,42 @@ async function run() {
       });
 
       // 최소 커밋 수 미달 시 알림 스킵
-      if (allCommits.length < minCommitCount) {
-        core.info(
-          `Notification skipped: commit count (${allCommits.length}) below minimum (${minCommitCount})`
-        );
+      if (!meetsMinCommitCount(allCommits, minCommitCount)) {
         // 배치 데이터 초기화 후 저장
         await fs.writeFile(
           batchFile,
-          JSON.stringify({ events: [], lastSent: batchedData.lastSent })
+          JSON.stringify({ events: [], lastSent: batchedData.lastSent }),
+        );
+        setSkippedOutputs();
+        core.info(
+          `Notification skipped: commit count (${allCommits.length}) below minimum (${minCommitCount})`,
         );
         return;
       }
 
-      // 커밋 상세 정보 생성
-      let commitDetails = allCommits
+      // 파일 변경 요약 계산 (lib 헬퍼 사용)
+      fileSummary = buildFileSummary(allCommits);
+
+      // 품질 점수 계산 (설정 시, lib 헬퍼 사용)
+      if (showQualityScore) {
+        qualityScore = calculateQualityScore(allCommits);
+      }
+
+      // 배치 데이터 초기화 및 저장
+      batchedData.events = [];
+      batchedData.lastSent = Date.now();
+      await fs.writeFile(batchFile, JSON.stringify(batchedData));
+    }
+
+    // --- 플랫폼별 메시지 빌드 헬퍼 ---
+    // 커밋 메시지는 사용자가 생성한 자유 텍스트이므로 플랫폼별 이스케이프 함수(escape)를
+    // 받아 각 플랫폼 마크업 규칙에 맞게 치환한다.
+    // 액터명·저장소명·URL·숫자 등 구조적 필드는 이스케이프하지 않는다.
+    const buildCommitDetails = (escape) =>
+      allCommits
         .map((c) => {
-          let authorName =
-            c.author && c.author.name ? c.author.name : 'Unknown'; // 커밋 작성자 이름, 없으면 'Unknown'
-          let commitLine = `- ${c.message} (by ${authorName})`; // 기본 커밋 라인
+          let authorName = c.author && c.author.name ? c.author.name : 'Unknown'; // 커밋 작성자 이름, 없으면 'Unknown'
+          let commitLine = `- ${escape(c.message)} (by ${authorName})`; // 기본 커밋 라인 (커밋 메시지 이스케이프 적용)
           if (includeDiffLinks && c.html_url) {
             // diff 링크 포함 설정 시 URL 추가
             commitLine += ` [View Diff](${c.html_url})`;
@@ -128,126 +147,50 @@ async function run() {
         })
         .join('\n'); // 줄바꿈으로 연결
 
-      // 파일 변경 요약 계산
-      let added = 0,
-        modified = 0,
-        removed = 0; // 추가/수정/삭제 파일 수
-      allCommits.forEach((c) => {
-        added += c.added?.length || 0; // 추가된 파일 수
-        modified += c.modified?.length || 0; // 수정된 파일 수
-        removed += c.removed?.length || 0; // 삭제된 파일 수
-      });
-      fileSummary = `🔸 *Files:* +${added}/~${modified}/-${removed}\n`;
-
-      // 품질 점수 계산 (설정 시)
-      if (showQualityScore) {
-        qualityScore =
-          allCommits.reduce((score, c) => {
-            const msgLengthScore = c.message.length > 10 ? 50 : 0; // 메시지 길이 10자 초과 시 +50
-            const fileChangeScore =
-              (c.added?.length + c.modified?.length + c.removed?.length || 0) <
-              10
-                ? 30
-                : 0; // 변경 파일 10개 미만 시 +30
-            return score + msgLengthScore + fileChangeScore; // 총합
-          }, 0) / allCommits.length || 0; // 평균 점수
-      }
-
-      // 최종 메시지 생성
-      messageText =
-        `🎉 *New push${batchedData.events.length > 1 ? 'es' : ''} to ${
-          repository.full_name
-        }* 🎉\n\n` + // 배치된 푸시 수에 따라 복수형 처리
-        `🔹 *Pusher:* ${pusher.name}${
-          batchedData.events.length > 1 ? ' and others' : ''
-        }\n` + // 여러 푸시 시 "and others" 추가
-        `🔹 *Commit count:* ${allCommits.length}\n` +
-        fileSummary +
-        (showQualityScore
-          ? `🔹 *Quality Score:* ${qualityScore.toFixed(1)}/100\n`
-          : '') + // 품질 점수 표시 (소수점 1자리)
-        `🔹 *Commits:*\n${commitDetails}\n` +
-        `🔗 [View Repository](${repository.html_url})`;
-
-      // 배치 데이터 초기화 및 저장
-      batchedData.events = [];
-      batchedData.lastSent = Date.now();
-      await fs.writeFile(batchFile, JSON.stringify(batchedData));
-    } else {
-      // 배치 이벤트가 없는 경우 (커밋 없는 푸시)
-      messageText =
-        `🎉 *New push to ${repository.full_name}* 🎉\n\n` +
-        `🔹 *Pusher:* ${pusher.name}\n` +
-        `🔹 *Commit count:* 0\n` +
-        `🔗 [View Repository](${repository.html_url})`;
-    }
-
-    // --- 플랫폼별 메시지 페이로드 준비 ---
-    slackPayload = {
-      text: messageText,
-      attachments: [
-        {
-          color: '#5865F2', // Slack 메시지 색상 (파란색)
-          text: `Push event at ${new Date().toUTCString()}`, // 푸시 시간 표시
-        },
-      ],
-    };
-    discordPayload = {
-      content: messageText,
-      embeds: [
-        {
-          color: 0x5865f2, // Discord 임베드 색상 (16진수, 파란색)
-          description: `Push event at ${new Date().toUTCString()}`,
-        },
-      ],
+    // 최종 메시지 생성 (커밋 없는 푸시의 경우 기본 메시지)
+    // message_prefix가 설정된 경우 각 플랫폼 메시지 앞에 `${prefix}\n`으로 결합한다.
+    const buildMessage = (escape) => {
+      const body = !hasCommits
+        ? `🎉 *New push to ${repository.full_name}* 🎉\n\n` +
+          `🔹 *Pusher:* ${pusher.name}\n` +
+          `🔹 *Commit count:* 0\n` +
+          `🔗 [View Repository](${repository.html_url})`
+        : `🎉 *New push${eventCount > 1 ? 'es' : ''} to ${repository.full_name}* 🎉\n\n` + // 배치된 푸시 수에 따라 복수형 처리
+          `🔹 *Pusher:* ${pusher.name}${eventCount > 1 ? ' and others' : ''}\n` + // 여러 푸시 시 "and others" 추가
+          `🔹 *Commit count:* ${allCommits.length}\n` +
+          fileSummary +
+          (showQualityScore ? `🔹 *Quality Score:* ${qualityScore.toFixed(1)}/100\n` : '') + // 품질 점수 표시 (소수점 1자리)
+          `🔹 *Commits:*\n${buildCommitDetails(escape)}\n` +
+          `🔗 [View Repository](${repository.html_url})`;
+      return formatMessageWithPrefix(messagePrefix, body);
     };
 
-    // --- 알림 전송 ---
-    let errors = []; // 전송 실패 시 오류 메시지 저장
-
-    // Slack 알림 전송
-    if (slackWebhookUrl) {
-      try {
-        await axios.post(slackWebhookUrl, slackPayload); // HTTP POST 요청으로 전송
-        core.info('Slack notification sent successfully!');
-      } catch (e) {
-        errors.push(`Slack failed: ${e.message}`); // 오류 기록
-      }
-    }
-
-    // Discord 알림 전송
-    if (discordWebhookUrl) {
-      try {
-        await axios.post(discordWebhookUrl, discordPayload);
-        core.info('Discord notification sent successfully!');
-      } catch (e) {
-        errors.push(`Discord failed: ${e.message}`);
-      }
-    }
-
-    // Telegram 알림 전송
-    if (telegramBotToken && telegramChatId) {
-      const telegramUrl = `https://api.telegram.org/bot${telegramBotToken}/sendMessage`; // Telegram API 엔드포인트
-      try {
-        await axios.post(telegramUrl, {
-          chat_id: telegramChatId,
-          text: messageText,
-          parse_mode: 'Markdown', // Markdown 형식으로 파싱
-        });
-        core.info('Telegram notification sent successfully!');
-      } catch (e) {
-        errors.push(`Telegram failed: ${e.message}`);
-      }
-    }
-
-    // --- 결과 처리 ---
-    if (errors.length > 0) {
-      // 일부 알림 실패 시 경고 출력
-      core.warning(`Some notifications failed:\n${errors.join('\n')}`);
-    } else {
-      // 모두 성공 시 정보 로그
-      core.info('All notifications sent successfully!');
-    }
+    // --- 알림 전송 (공통 모듈 notifyAll: 플랫폼별 실패 격리 처리) ---
+    // 각 플랫폼은 자신의 이스케이프 함수로 커밋 메시지를 치환한 메시지를 받는다.
+    await notifyAll(inputs, {
+      slack: () => ({
+        text: buildMessage(escapeForSlack),
+        attachments: [
+          {
+            color: '#5865F2', // Slack 메시지 색상 (파란색)
+            text: `Push event at ${new Date().toUTCString()}`, // 푸시 시간 표시
+          },
+        ],
+      }),
+      discord: () => ({
+        content: buildMessage(escapeForDiscord),
+        embeds: [
+          {
+            color: 0x5865f2, // Discord 임베드 색상 (16진수, 파란색)
+            description: `Push event at ${new Date().toUTCString()}`,
+          },
+        ],
+      }),
+      telegram: () => ({
+        text: buildMessage(escapeForTelegram),
+        parse_mode: 'Markdown', // Markdown 형식으로 파싱
+      }),
+    });
   } catch (error) {
     // 전체 실행 중 오류 발생 시 실패 처리
     core.setFailed(`Error: ${error.message}`);

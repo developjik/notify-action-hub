@@ -18,9 +18,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Send PR Notification
-        uses: developjik/notify-action-hub/notify-action-hub/notify-on-pr@v1
+        id: notify
+        uses: developjik/notify-action-hub/notify-on-pr@v1
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
           slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
           discord_webhook_url: ${{ secrets.DISCORD_WEBHOOK_URL }}
           telegram_bot_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
@@ -29,15 +29,31 @@ jobs:
 
 ## 🔧 Inputs
 
-| Name                  | Description                                   | Required |
-| --------------------- | --------------------------------------------- | -------- |
-| `github_token`        | GitHub token to fetch PR information          | ✅ Yes   |
-| `slack_webhook_url`   | Slack Webhook URL                             | ❌ No    |
-| `discord_webhook_url` | Discord Webhook URL                           | ❌ No    |
-| `telegram_bot_token`  | Telegram Bot token                            | ❌ No    |
-| `telegram_chat_id`    | Telegram Chat ID (required if using Telegram) | ❌ No    |
+| Name                  | Description                                                       | Required |
+| --------------------- | ----------------------------------------------------------------- | -------- |
+| `slack_webhook_url`   | Slack Webhook URL                                                 | ❌ No    |
+| `discord_webhook_url` | Discord Webhook URL                                               | ❌ No    |
+| `telegram_bot_token`  | Telegram Bot token                                                | ❌ No    |
+| `telegram_chat_id`    | Telegram Chat ID (required if using Telegram)                     | ❌ No    |
+| `dry_run`             | Log the payload instead of sending it (true/false)                | ❌ No    |
+| `message_prefix`      | Prefix prepended to the notification message (e.g., project name) | ❌ No    |
 
 > **Note:** At least one notification method (Slack, Discord, or Telegram) must be provided.
+
+## 📤 Outputs
+
+| Name                  | Description                                                                 |
+| --------------------- | --------------------------------------------------------------------------- |
+| `notification_status` | Notification result (`sent` / `partial` / `failed` / `dry-run` / `skipped`) |
+| `failed_platforms`    | Comma-separated list of platforms that failed (empty string if none)        |
+
+You can reference them in subsequent steps via `steps.notify.outputs.*`:
+
+```yaml
+- name: Check notification result
+  if: ${{ steps.notify.outputs.notification_status == 'partial' }}
+  run: echo "failed_platforms = ${{ steps.notify.outputs.failed_platforms }}"
+```
 
 ## 📩 Notification Examples
 

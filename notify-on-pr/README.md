@@ -18,9 +18,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: PR 알림 보내기
-        uses: developjik/notify-action-hub/notify-action-hub/notify-on-pr@v1
+        id: notify
+        uses: developjik/notify-action-hub/notify-on-pr@v1
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
           slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
           discord_webhook_url: ${{ secrets.DISCORD_WEBHOOK_URL }}
           telegram_bot_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
@@ -29,15 +29,31 @@ jobs:
 
 ## 🔧 입력값
 
-| 이름                  | 설명                                     | 필수 여부 |
-| --------------------- | ---------------------------------------- | --------- |
-| `github_token`        | PR 정보를 가져오기 위한 GitHub 토큰      | ✅ 예     |
-| `slack_webhook_url`   | Slack Webhook URL                        | ❌ 아니오 |
-| `discord_webhook_url` | Discord Webhook URL                      | ❌ 아니오 |
-| `telegram_bot_token`  | Telegram Bot 토큰                        | ❌ 아니오 |
-| `telegram_chat_id`    | Telegram Chat ID (Telegram 사용 시 필수) | ❌ 아니오 |
+| 이름                  | 설명                                          | 필수 여부 |
+| --------------------- | --------------------------------------------- | --------- |
+| `slack_webhook_url`   | Slack Webhook URL                             | ❌ 아니오 |
+| `discord_webhook_url` | Discord Webhook URL                           | ❌ 아니오 |
+| `telegram_bot_token`  | Telegram Bot 토큰                             | ❌ 아니오 |
+| `telegram_chat_id`    | Telegram Chat ID (Telegram 사용 시 필수)      | ❌ 아니오 |
+| `dry_run`             | 전송 대신 로그만 출력 (true/false)            | ❌ 아니오 |
+| `message_prefix`      | 알림 메시지 앞에 붙는 접두사 (예: 프로젝트명) | ❌ 아니오 |
 
 > **참고:** 최소 하나 이상의 알림 방법(Slack, Discord, Telegram)이 필요합니다.
+
+## 📤 출력값
+
+| 이름                  | 설명                                                              |
+| --------------------- | ----------------------------------------------------------------- |
+| `notification_status` | 알림 결과 (`sent` / `partial` / `failed` / `dry-run` / `skipped`) |
+| `failed_platforms`    | 전송에 실패한 플랫폼의 쉼표 목록 (없으면 빈 문자열)               |
+
+후속 스텝에서 `steps.notify.outputs.*` 형태로 참조할 수 있습니다:
+
+```yaml
+- name: 알림 결과 확인
+  if: ${{ steps.notify.outputs.notification_status == 'partial' }}
+  run: echo "실패한 플랫폼 = ${{ steps.notify.outputs.failed_platforms }}"
+```
 
 ## 📩 알림 예시
 

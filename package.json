@@ -1,0 +1,28 @@
+{
+  "name": "notify-action-hub",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Collection of GitHub Actions that notify Slack/Discord/Telegram about GitHub events",
+  "workspaces": [
+    "common",
+    "notify-on-*"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build:all": "for d in notify-on-*; do (cd \"$d\" && ncc build index.js -o dist) || exit 1; done",
+    "test": "vitest run",
+    "lint": "eslint .",
+    "format": "prettier --write \"*.mjs\" \"common/**/*.js\" \"notify-on-*/*.js\" \"tests/**/*.js\"",
+    "format:check": "prettier --check \"*.mjs\" \"common/**/*.js\" \"notify-on-*/*.js\" \"tests/**/*.js\"",
+    "check-dist": "bash scripts/check-dist.sh"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@vercel/ncc": "^0.38.3",
+    "eslint": "^10.13.0",
+    "prettier": "^3.9.10",
+    "vitest": "^4.1.12"
+  }
+}

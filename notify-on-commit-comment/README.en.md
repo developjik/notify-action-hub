@@ -18,7 +18,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Send Notification
-        uses: developjik/notify-action-hub/notify-commit-comment@v1
+        id: notify
+        uses: developjik/notify-action-hub/notify-on-commit-comment@v1
         with:
           slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
           discord_webhook_url: ${{ secrets.DISCORD_WEBHOOK_URL }}
@@ -28,14 +29,31 @@ jobs:
 
 ## 🔧 Inputs
 
-| Name                  | Description                  | Required |
-| --------------------- | ---------------------------- | -------- |
-| `slack_webhook_url`   | Slack Incoming Webhook URL   | ❌ No    |
-| `discord_webhook_url` | Discord Incoming Webhook URL | ❌ No    |
-| `telegram_bot_token`  | Telegram Bot Token           | ❌ No    |
-| `telegram_chat_id`    | Telegram Chat ID             | ❌ No    |
+| Name                  | Description                                                       | Required |
+| --------------------- | ----------------------------------------------------------------- | -------- |
+| `slack_webhook_url`   | Slack Incoming Webhook URL                                        | ❌ No    |
+| `discord_webhook_url` | Discord Incoming Webhook URL                                      | ❌ No    |
+| `telegram_bot_token`  | Telegram Bot Token                                                | ❌ No    |
+| `telegram_chat_id`    | Telegram Chat ID                                                  | ❌ No    |
+| `dry_run`             | Log the payload instead of sending it (true/false)                | ❌ No    |
+| `message_prefix`      | Prefix prepended to the notification message (e.g., project name) | ❌ No    |
 
 At least one of `slack_webhook_url`, `discord_webhook_url`, or `telegram_bot_token` + `telegram_chat_id` must be provided.
+
+## 📤 Outputs
+
+| Name                  | Description                                                                 |
+| --------------------- | --------------------------------------------------------------------------- |
+| `notification_status` | Notification result (`sent` / `partial` / `failed` / `dry-run` / `skipped`) |
+| `failed_platforms`    | Comma-separated list of platforms that failed (empty string if none)        |
+
+You can reference them in subsequent steps via `steps.notify.outputs.*`:
+
+```yaml
+- name: Check notification result
+  if: ${{ steps.notify.outputs.notification_status == 'partial' }}
+  run: echo "failed_platforms = ${{ steps.notify.outputs.failed_platforms }}"
+```
 
 ## 📩 Notification Examples
 

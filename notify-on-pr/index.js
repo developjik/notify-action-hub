@@ -1,18 +1,27 @@
 const core = require('@actions/core');
 const github = require('@actions/github');
-const axios = require('axios');
+// 공통 알림 모듈: 입력 파싱·플랫폼 검증·전송·이스케이프를 제공 (ncc로 함께 번들링됨)
+const {
+  getNotificationInputs,
+  validateNotificationPlatforms,
+  notifyAll,
+  escapeForSlack,
+  escapeForDiscord,
+  escapeForTelegram,
+  setSkippedOutputs,
+  formatMessageWithPrefix,
+} = require('../common/notify');
 
 async function run() {
   try {
-    const slackWebhookUrl = core.getInput('slack_webhook_url');
-    const discordWebhookUrl = core.getInput('discord_webhook_url');
-    const telegramBotToken = core.getInput('telegram_bot_token');
-    const telegramChatId = core.getInput('telegram_chat_id');
+    // --- 알림 플랫폼 입력값 파싱 (웹훅/토큰은 setSecret로 마스킹됨) ---
+    const inputs = getNotificationInputs();
 
-    if (!slackWebhookUrl && !discordWebhookUrl && !telegramBotToken) {
-      core.setFailed(
-        'At least one notification method (Slack, Discord, or Telegram) must be provided.'
-      );
+    // 설정된 알림 플랫폼이 하나도 없으면 실패 처리 (전송 이전에 검증)
+    const platformError = validateNotificationPlatforms(inputs);
+    if (platformError) {
+      setSkippedOutputs();
+      core.setFailed(platformError);
       return;
     }
 
@@ -24,35 +33,32 @@ async function run() {
       return;
     }
 
-    const messageText =
-      `📢 *Pull Request Alert* 📢\n\n` +
-      `🔹 *Title:* ${pr.title}\n` +
-      `🔹 *Author:* ${pr.user.login}\n` +
-      `🔹 *State:* ${pr.state}\n` +
-      `🔹 [View PR](${pr.html_url})`;
+    // --- 메시지 접두사 ---
+    // message_prefix가 설정된 경우 각 플랫폼 메시지 앞에 `${prefix}\n`으로 결합된다.
+    const messagePrefix = core.getInput('message_prefix');
 
-    // Slack 메시지 전송
-    if (slackWebhookUrl) {
-      await axios.post(slackWebhookUrl, { text: messageText });
-      core.info('Slack notification sent successfully!');
-    }
+    // --- 플랫폼별 메시지 빌드 ---
+    // PR 제목은 사용자가 생성한 자유 텍스트이므로 각 플랫폼 마크업 규칙에 맞게 이스케이프.
+    // 액터명·상태·URL 등 구조적 필드는 이스케이프하지 않는다.
+    const buildMessage = (escapedTitle) =>
+      formatMessageWithPrefix(
+        messagePrefix,
+        `📢 *Pull Request Alert* 📢\n\n` +
+          `🔹 *Title:* ${escapedTitle}\n` +
+          `🔹 *Author:* ${pr.user.login}\n` +
+          `🔹 *State:* ${pr.state}\n` +
+          `🔹 [View PR](${pr.html_url})`,
+      );
 
-    // Discord 메시지 전송
-    if (discordWebhookUrl) {
-      await axios.post(discordWebhookUrl, { content: messageText });
-      core.info('Discord notification sent successfully!');
-    }
-
-    // Telegram 메시지 전송
-    if (telegramBotToken && telegramChatId) {
-      const telegramUrl = `https://api.telegram.org/bot${telegramBotToken}/sendMessage`;
-      await axios.post(telegramUrl, {
-        chat_id: telegramChatId,
-        text: messageText,
+    // --- 알림 전송 (플랫폼별 실패 격리는 notifyAll 내부에서 처리) ---
+    await notifyAll(inputs, {
+      slack: () => ({ text: buildMessage(escapeForSlack(pr.title)) }),
+      discord: () => ({ content: buildMessage(escapeForDiscord(pr.title)) }),
+      telegram: () => ({
+        text: buildMessage(escapeForTelegram(pr.title)),
         parse_mode: 'Markdown',
-      });
-      core.info('Telegram notification sent successfully!');
-    }
+      }),
+    });
   } catch (error) {
     core.setFailed(`Error: ${error.message}`);
   }

@@ -1,5 +1,7 @@
 # 🔔 GitHub Notification Action Hub
 
+[![Documentation](https://img.shields.io/badge/docs-GitHub_Pages-blue)](https://developjik.github.io/notify-action-hub/en/)
+
 A collection of GitHub Actions for sending notifications about GitHub events to various platforms.
 
 ## 🌟 Key Features
@@ -14,18 +16,24 @@ A collection of GitHub Actions for sending notifications about GitHub events to 
   - ❌ Workflow failures
   - 🗑️ Branch deletions
 
-
 ## 🧱 Technical Standards
 
 - All actions run on `runs.using: node20`.
 - Execution entry points in `action.yml` are standardized to `dist/index.js`.
+- The repository root is an npm workspace (`common` + `notify-on-*`) with a single root `package-lock.json`.
 - Release artifacts use `ncc` bundles and commit generated `dist/` output.
-- Metadata consistency and workflow syntax (`actionlint`) are automatically validated in `.github/workflows/metadata-consistency.yml` on PRs and pushes to `main`.
+- PRs and pushes to `main` are automatically validated in `.github/workflows/validate-actions.yml` for workflow syntax (`actionlint`), metadata consistency, unit tests (vitest), lint (ESLint/Prettier), and dist freshness.
 
-You can run the same check locally with:
+You can run the same checks locally with:
 
 ```bash
-bash scripts/validate-actions-metadata.sh
+npm ci                  # install dependencies (single root lockfile)
+npm test                # unit tests (vitest)
+npm run lint            # ESLint
+npm run format:check    # Prettier check
+bash scripts/validate-actions.sh   # action.yml metadata checks
+bash scripts/check-dist.sh         # dist freshness check
+npm run build:all       # rebuild all dist bundles after source changes
 ```
 
 ## 🔧 Setup Guide
