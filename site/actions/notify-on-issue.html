@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>notify-on-issue — GitHub 알림 액션 허브</title>
+<meta name="description" content="notify-on-issue GitHub Action. 이슈가 열리거나 수정·종료될 때 알림을 보냅니다. Slack, Discord, Telegram 지원.">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="site-title" href="../index.html">🔔 notify-action-hub</a>
+    <nav class="site-nav" aria-label="주 메뉴">
+      <a class="nav-link" href="../index.html">홈</a>
+      <a class="nav-link" href="../index.html#actions">액션 목록</a>
+      <a class="lang-switch" href="../en/actions/notify-on-issue.html" lang="en" hreflang="en" rel="alternate">English</a>
+    </nav>
+  </div>
+</header>
+<main>
+  <section class="hero">
+    <div class="container">
+      <p class="breadcrumb"><a href="../index.html">문서</a> / <a href="../index.html#actions">액션</a></p>
+      <h1>🐞 notify-on-issue</h1>
+      <p class="tagline">이슈가 열리거나 수정·종료될 때 알림을 보냅니다.</p>
+      <div class="code-block">
+        <button class="copy-btn" type="button" data-copied-label="복사됨!">복사</button>
+        <pre><code>uses: developjik/notify-action-hub/notify-on-issue@v1</code></pre>
+      </div>
+      <p class="hero-note">위 코드를 복사해 워크플로우의 <code>uses:</code>에 붙여넣으세요.</p>
+      <div class="hero-badges">
+        <span class="pill">GitHub 이벤트: issues (opened · edited · closed)</span>
+        <span class="pill">Slack · Discord · Telegram</span>
+      </div>
+    </div>
+  </section>
+  <div class="container">
+    <section class="section" id="inputs">
+      <h2>입력값 (Inputs)<a class="anchor" href="#inputs">¶</a></h2>
+      <div class="table-wrap">
+        <table class="inputs-table">
+          <thead>
+            <tr><th>이름</th><th>필수</th><th>기본값</th><th>설명</th></tr>
+          </thead>
+          <tbody>
+          <tr><td><code>slack_webhook_url</code></td><td>❌ 선택</td><td>—</td><td>Slack 수신 웹훅(Incoming Webhook) URL</td></tr>
+          <tr><td><code>discord_webhook_url</code></td><td>❌ 선택</td><td>—</td><td>Discord 웹훅 URL</td></tr>
+          <tr><td><code>telegram_bot_token</code></td><td>❌ 선택</td><td>—</td><td>Telegram 봇 토큰 (<code>telegram_chat_id</code>와 함께 사용)</td></tr>
+          <tr><td><code>telegram_chat_id</code></td><td>❌ 선택</td><td>—</td><td>Telegram 채팅 ID (<code>telegram_bot_token</code>와 함께 사용)</td></tr>
+          <tr><td><code>dry_run</code></td><td>❌ 선택</td><td><code>false</code></td><td>전송 대신 페이로드를 로그로만 출력 (true/false)</td></tr>
+          <tr><td><code>message_prefix</code></td><td>❌ 선택</td><td>—</td><td>알림 메시지 앞에 붙는 접두사 (예: 프로젝트명)</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="note">Slack, Discord, Telegram 중 하나 이상의 알림 채널을 설정해야 합니다. 설정하지 않은 플랫폼은 건너뜁니다.</p>
+    </section>
+    <section class="section" id="outputs">
+      <h2>출력값 (Outputs)<a class="anchor" href="#outputs">¶</a></h2>
+      <div class="table-wrap">
+        <table class="outputs-table">
+          <thead>
+            <tr><th>이름</th><th>설명</th></tr>
+          </thead>
+          <tbody>
+          <tr><td><code>notification_status</code></td><td>알림 결과: <code>sent</code> / <code>partial</code> / <code>failed</code> / <code>dry-run</code> / <code>skipped</code></td></tr>
+          <tr><td><code>failed_platforms</code></td><td>전송에 실패한 플랫폼의 쉼표 목록 (없으면 빈 문자열)</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="note">후속 스텝에서 <code>steps.notify.outputs.*</code> 형태로 참조할 수 있습니다.</p>
+    </section>
+    <section class="section" id="example">
+      <h2>사용 예시<a class="anchor" href="#example">¶</a></h2>
+      <h3>기본 사용 예시</h3>
+<div class="code-block"><button class="copy-btn" type="button" data-copied-label="복사됨!">복사</button><pre><code>name: 이슈 알림
+
+on:
+  issues:
+    types: [opened, edited, closed]
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 이슈 알림 보내기
+        id: notify
+        uses: developjik/notify-action-hub/notify-on-issue@v1
+        with:
+          slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+          discord_webhook_url: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          telegram_bot_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          telegram_chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}</code></pre></div>
+      <h3>출력값 사용 예시</h3>
+<div class="code-block"><button class="copy-btn" type="button" data-copied-label="복사됨!">복사</button><pre><code>- name: 알림 결과 확인
+  if: ${{ steps.notify.outputs.notification_status == 'partial' }}
+  run: echo "실패한 플랫폼 = ${{ steps.notify.outputs.failed_platforms }}"</code></pre></div>
+    </section>
+  </div>
+</main>
+<footer class="site-footer">
+  <div class="container footer-inner">
+    <div class="footer-links">
+      <a href="https://github.com/developjik/notify-action-hub" rel="noopener">GitHub 저장소</a>
+      <a href="https://github.com/developjik/notify-action-hub/blob/main/LICENSE" rel="noopener">MIT License</a>
+    </div>
+    <nav class="footer-links" aria-label="액션 문서">
+      <a href="../actions/notify-on-issue.html">notify-on-issue</a>
+      <a href="../actions/notify-on-pr.html">notify-on-pr</a>
+      <a href="../actions/notify-on-push.html">notify-on-push</a>
+      <a href="../actions/notify-on-release.html">notify-on-release</a>
+      <a href="../actions/notify-on-commit-comment.html">notify-on-commit-comment</a>
+      <a href="../actions/notify-on-failure.html">notify-on-failure</a>
+      <a href="../actions/notify-on-branch-delete.html">notify-on-branch-delete</a>
+    </nav>
+  </div>
+</footer>
+<script src="../assets/site.js"></script>
+</body>
+</html>

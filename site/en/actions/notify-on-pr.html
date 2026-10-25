@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>notify-on-pr — GitHub Notification Action Hub</title>
+<meta name="description" content="notify-on-pr GitHub Action. Sends notifications when a pull request is opened or updated. Supports Slack, Discord, and Telegram.">
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="site-title" href="../../index.html">🔔 notify-action-hub</a>
+    <nav class="site-nav" aria-label="Main navigation">
+      <a class="nav-link" href="../../index.html">Home</a>
+      <a class="nav-link" href="../../index.html#actions">Actions</a>
+      <a class="lang-switch" href="../../actions/notify-on-pr.html" lang="ko" hreflang="ko" rel="alternate">한국어</a>
+    </nav>
+  </div>
+</header>
+<main>
+  <section class="hero">
+    <div class="container">
+      <p class="breadcrumb"><a href="../../index.html">Docs</a> / <a href="../../index.html#actions">Actions</a></p>
+      <h1>🔄 notify-on-pr</h1>
+      <p class="tagline">Sends notifications when a pull request is opened or updated.</p>
+      <div class="code-block">
+        <button class="copy-btn" type="button" data-copied-label="Copied!">Copy</button>
+        <pre><code>uses: developjik/notify-action-hub/notify-on-pr@v1</code></pre>
+      </div>
+      <p class="hero-note">Copy the snippet above and paste it into the <code>uses:</code> of your workflow.</p>
+      <div class="hero-badges">
+        <span class="pill">GitHub event: pull_request (opened · reopened · synchronize)</span>
+        <span class="pill">Slack · Discord · Telegram</span>
+      </div>
+    </div>
+  </section>
+  <div class="container">
+    <section class="section" id="inputs">
+      <h2>Inputs<a class="anchor" href="#inputs">¶</a></h2>
+      <div class="table-wrap">
+        <table class="inputs-table">
+          <thead>
+            <tr><th>Name</th><th>Required</th><th>Default</th><th>Description</th></tr>
+          </thead>
+          <tbody>
+          <tr><td><code>slack_webhook_url</code></td><td>❌ Optional</td><td>—</td><td>Slack Incoming Webhook URL</td></tr>
+          <tr><td><code>discord_webhook_url</code></td><td>❌ Optional</td><td>—</td><td>Discord Incoming Webhook URL</td></tr>
+          <tr><td><code>telegram_bot_token</code></td><td>❌ Optional</td><td>—</td><td>Telegram Bot Token</td></tr>
+          <tr><td><code>telegram_chat_id</code></td><td>❌ Optional</td><td>—</td><td>Telegram Chat ID (Required if using Telegram notifications)</td></tr>
+          <tr><td><code>dry_run</code></td><td>❌ Optional</td><td><code>false</code></td><td>Log the payload instead of actually sending it (true/false)</td></tr>
+          <tr><td><code>message_prefix</code></td><td>❌ Optional</td><td>—</td><td>Prefix prepended to the notification message (e.g., project name)</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="note">At least one notification channel (Slack, Discord, or Telegram) must be configured. Unconfigured platforms are skipped.</p>
+    </section>
+    <section class="section" id="outputs">
+      <h2>Outputs<a class="anchor" href="#outputs">¶</a></h2>
+      <div class="table-wrap">
+        <table class="outputs-table">
+          <thead>
+            <tr><th>Name</th><th>Description</th></tr>
+          </thead>
+          <tbody>
+          <tr><td><code>notification_status</code></td><td>Notification result: sent, partial, failed, dry-run, or skipped</td></tr>
+          <tr><td><code>failed_platforms</code></td><td>Comma-separated list of platforms that failed (empty if none)</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="note">Outputs can be referenced in later steps via <code>steps.notify.outputs.*</code>.</p>
+    </section>
+    <section class="section" id="example">
+      <h2>Usage example<a class="anchor" href="#example">¶</a></h2>
+      <h3>Basic usage</h3>
+<div class="code-block"><button class="copy-btn" type="button" data-copied-label="Copied!">Copy</button><pre><code>name: PR Notification
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send PR Notification
+        id: notify
+        uses: developjik/notify-action-hub/notify-on-pr@v1
+        with:
+          slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+          discord_webhook_url: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          telegram_bot_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          telegram_chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}</code></pre></div>
+      <h3>Using outputs in a later step</h3>
+<div class="code-block"><button class="copy-btn" type="button" data-copied-label="Copied!">Copy</button><pre><code>- name: Check notification result
+  if: ${{ steps.notify.outputs.notification_status == 'partial' }}
+  run: echo "failed_platforms = ${{ steps.notify.outputs.failed_platforms }}"</code></pre></div>
+    </section>
+  </div>
+</main>
+<footer class="site-footer">
+  <div class="container footer-inner">
+    <div class="footer-links">
+      <a href="https://github.com/developjik/notify-action-hub" rel="noopener">GitHub repository</a>
+      <a href="https://github.com/developjik/notify-action-hub/blob/main/LICENSE" rel="noopener">MIT License</a>
+    </div>
+    <nav class="footer-links" aria-label="Action docs">
+      <a href="../../actions/notify-on-issue.html">notify-on-issue</a>
+      <a href="../../actions/notify-on-pr.html">notify-on-pr</a>
+      <a href="../../actions/notify-on-push.html">notify-on-push</a>
+      <a href="../../actions/notify-on-release.html">notify-on-release</a>
+      <a href="../../actions/notify-on-commit-comment.html">notify-on-commit-comment</a>
+      <a href="../../actions/notify-on-failure.html">notify-on-failure</a>
+      <a href="../../actions/notify-on-branch-delete.html">notify-on-branch-delete</a>
+    </nav>
+  </div>
+</footer>
+<script src="../../assets/site.js"></script>
+</body>
+</html>

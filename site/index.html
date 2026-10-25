@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>notify-action-hub — GitHub 알림 액션 허브</title>
+<meta name="description" content="GitHub 이벤트 알림을 Slack, Discord, Telegram으로 전송하는 GitHub Actions 모음. 7개 이벤트 액션 문서와 퀵스타트 제공.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="site-title" href="index.html">🔔 notify-action-hub</a>
+    <nav class="site-nav" aria-label="주 메뉴">
+      <a class="nav-link" href="index.html">홈</a>
+      <a class="nav-link" href="index.html#actions">액션 목록</a>
+      <a class="lang-switch" href="en/index.html" lang="en" hreflang="en" rel="alternate">English</a>
+    </nav>
+  </div>
+</header>
+<main>
+  <section class="hero">
+    <div class="container">
+      <h1>🔔 GitHub 알림 액션 허브</h1>
+      <p class="tagline">GitHub 이벤트에 대한 알림을 Slack, Discord, Telegram으로 전송하는 GitHub Actions 모음입니다. 워크플로우 몇 줄만 추가하면 바로 사용할 수 있습니다.</p>
+      <div class="hero-badges">
+        <span class="pill">7개 이벤트 액션</span>
+        <span class="pill">3개 알림 플랫폼</span>
+        <span class="pill">node20 런타임</span>
+        <span class="pill">MIT License</span>
+      </div>
+    </div>
+  </section>
+  <div class="container">
+    <section class="section" id="support-matrix-section">
+      <h2>지원 매트릭스<a class="anchor" href="#support-matrix-section">¶</a></h2>
+      <p>7개 액션 모두 Slack, Discord, Telegram을 지원합니다.</p>
+      <div class="table-wrap">
+        <table class="support-matrix" id="support-matrix">
+          <thead>
+            <tr><th>액션</th><th>GitHub 이벤트</th><th>Slack</th><th>Discord</th><th>Telegram</th></tr>
+          </thead>
+          <tbody>
+          <tr><td><a href="actions/notify-on-issue.html"><code>notify-on-issue</code></a></td><td><code>issues</code></td><td class="check">✓</td><td class="check">✓</td><td class="check">✓</td></tr>
+          <tr><td><a href="actions/notify-on-pr.html"><code>notify-on-pr</code></a></td><td><code>pull_request</code></td><td class="check">✓</td><td class="check">✓</td><td class="check">✓</td></tr>
+          <tr><td><a href="actions/notify-on-push.html"><code>notify-on-push</code></a></td><td><code>push</code></td><td class="check">✓</td><td class="check">✓</td><td class="check">✓</td></tr>
+          <tr><td><a href="actions/notify-on-release.html"><code>notify-on-release</code></a></td><td><code>release</code></td><td class="check">✓</td><td class="check">✓</td><td class="check">✓</td></tr>
+          <tr><td><a href="actions/notify-on-commit-comment.html"><code>notify-on-commit-comment</code></a></td><td><code>issue_comment</code></td><td class="check">✓</td><td class="check">✓</td><td class="check">✓</td></tr>
+          <tr><td><a href="actions/notify-on-failure.html"><code>notify-on-failure</code></a></td><td><code>workflow_run</code></td><td class="check">✓</td><td class="check">✓</td><td class="check">✓</td></tr>
+          <tr><td><a href="actions/notify-on-branch-delete.html"><code>notify-on-branch-delete</code></a></td><td><code>delete</code></td><td class="check">✓</td><td class="check">✓</td><td class="check">✓</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+    <section class="section" id="quickstart">
+      <h2>퀵스타트<a class="anchor" href="#quickstart">¶</a></h2>
+<ol class="steps">
+        <li>알림 채널을 준비합니다 — Slack 수신 웹훅, Discord 웹훅, 또는 Telegram 봇 토큰 + 채팅 ID.</li>
+        <li>GitHub 저장소의 <strong>Settings → Secrets and variables → Actions</strong>에서 시크릿을 등록합니다: <code>SLACK_WEBHOOK_URL</code>, <code>DISCORD_WEBHOOK_URL</code>, <code>TELEGRAM_BOT_TOKEN</code>, <code>TELEGRAM_CHAT_ID</code></li>
+        <li>아래 예시를 <code>.github/workflows/</code>에 저장하고, <code>uses:</code> 경로를 원하는 액션으로 바꿉니다.</li>
+      </ol>
+<div class="code-block"><button class="copy-btn" type="button" data-copied-label="복사됨!">복사</button><pre><code>name: 이슈 알림
+
+on:
+  issues:
+    types: [opened, edited, closed]
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 이슈 알림 보내기
+        id: notify
+        uses: developjik/notify-action-hub/notify-on-issue@v1
+        with:
+          slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+          discord_webhook_url: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          telegram_bot_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          telegram_chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}</code></pre></div>
+      <p class="note">대표 예시는 <code>notify-on-issue</code>입니다. 다른 이벤트는 위 매트릭스 또는 아래 카드에서 해당 액션 문서를 확인하세요.</p>
+    </section>
+    <section class="section" id="actions">
+      <h2>액션 카탈로그<a class="anchor" href="#actions">¶</a></h2>
+<div class="cards">
+        <a class="card" href="actions/notify-on-issue.html">
+          <span class="card-icon" aria-hidden="true">🐞</span>
+          <h3>notify-on-issue</h3>
+          <p>이슈가 열리거나 수정·종료될 때 알림을 보냅니다.</p>
+          <span class="card-more">문서 보기 →</span>
+        </a>
+        <a class="card" href="actions/notify-on-pr.html">
+          <span class="card-icon" aria-hidden="true">🔄</span>
+          <h3>notify-on-pr</h3>
+          <p>Pull Request가 열리거나 업데이트될 때 알림을 보냅니다.</p>
+          <span class="card-more">문서 보기 →</span>
+        </a>
+        <a class="card" href="actions/notify-on-push.html">
+          <span class="card-icon" aria-hidden="true">⬆️</span>
+          <h3>notify-on-push</h3>
+          <p>push 이벤트 알림 + 시간대·배치·품질 점수 등 고급 옵션.</p>
+          <span class="card-more">문서 보기 →</span>
+        </a>
+        <a class="card" href="actions/notify-on-release.html">
+          <span class="card-icon" aria-hidden="true">🚀</span>
+          <h3>notify-on-release</h3>
+          <p>새 릴리스가 게시될 때 알림을 보냅니다.</p>
+          <span class="card-more">문서 보기 →</span>
+        </a>
+        <a class="card" href="actions/notify-on-commit-comment.html">
+          <span class="card-icon" aria-hidden="true">💬</span>
+          <h3>notify-on-commit-comment</h3>
+          <p>커밋에 댓글이 달릴 때 알림을 보냅니다.</p>
+          <span class="card-more">문서 보기 →</span>
+        </a>
+        <a class="card" href="actions/notify-on-failure.html">
+          <span class="card-icon" aria-hidden="true">❌</span>
+          <h3>notify-on-failure</h3>
+          <p>GitHub Actions 워크플로우가 실패했을 때 알림을 보냅니다.</p>
+          <span class="card-more">문서 보기 →</span>
+        </a>
+        <a class="card" href="actions/notify-on-branch-delete.html">
+          <span class="card-icon" aria-hidden="true">🗑️</span>
+          <h3>notify-on-branch-delete</h3>
+          <p>브랜치가 삭제될 때 알림을 보냅니다.</p>
+          <span class="card-more">문서 보기 →</span>
+        </a>
+      </div>
+    </section>
+  </div>
+</main>
+<footer class="site-footer">
+  <div class="container footer-inner">
+    <div class="footer-links">
+      <a href="https://github.com/developjik/notify-action-hub" rel="noopener">GitHub 저장소</a>
+      <a href="https://github.com/developjik/notify-action-hub/blob/main/LICENSE" rel="noopener">MIT License</a>
+    </div>
+    <nav class="footer-links" aria-label="액션 문서">
+      <a href="actions/notify-on-issue.html">notify-on-issue</a>
+      <a href="actions/notify-on-pr.html">notify-on-pr</a>
+      <a href="actions/notify-on-push.html">notify-on-push</a>
+      <a href="actions/notify-on-release.html">notify-on-release</a>
+      <a href="actions/notify-on-commit-comment.html">notify-on-commit-comment</a>
+      <a href="actions/notify-on-failure.html">notify-on-failure</a>
+      <a href="actions/notify-on-branch-delete.html">notify-on-branch-delete</a>
+    </nav>
+  </div>
+</footer>
+<script src="assets/site.js"></script>
+</body>
+</html>
