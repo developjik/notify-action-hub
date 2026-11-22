@@ -15,7 +15,7 @@ Changes should stay reviewable, CI-backed, and easy to release.
 
 - Keep one PR focused on one workflow or one action package.
 - Update the relevant `README.md` and `README.en.md` when behavior changes.
-- Keep every `action.yml` on `runs.using: 'node20'` and `runs.main: 'dist/index.js'`.
+- Keep every `action.yml` on `runs.using: 'node24'` and `runs.main: 'dist/index.js'`.
 - After changing any `index.js`, `lib.js`, or `common/` source, rebuild bundles with
   `npm run build:all` and commit the updated `dist/index.js` output. CI rejects stale
   bundles.

@@ -19,7 +19,7 @@ jobs:
     steps:
       - name: 알림 보내기
         id: notify
-        uses: developjik/notify-action-hub/notify-on-commit-comment@v1
+        uses: developjik/notify-action-hub/notify-on-commit-comment@v2
         with:
           slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
           discord_webhook_url: ${{ secrets.DISCORD_WEBHOOK_URL }}

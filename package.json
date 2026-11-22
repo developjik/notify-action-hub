@@ -8,7 +8,7 @@
     "notify-on-*"
   ],
   "engines": {
-    "node": ">=20"
+    "node": ">=24"
   },
   "scripts": {
     "build:all": "for d in notify-on-*; do (cd \"$d\" && ncc build index.js -o dist) || exit 1; done",

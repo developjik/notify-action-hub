@@ -18,7 +18,7 @@ GitHub 이벤트에 대한 알림을 다양한 플랫폼으로 전송하는 GitH
 
 ## 🧱 기술 표준
 
-- 모든 액션은 `runs.using: node20` 기준으로 동작합니다.
+- 모든 액션은 `runs.using: node24` 기준으로 동작합니다.
 - `action.yml`의 실행 엔트리는 `dist/index.js`로 통일되어 있습니다.
 - 저장소 루트가 npm 워크스페이스(`common` + `notify-on-*`)이며, 디펜던시는 단일 루트 `package-lock.json`으로 관리합니다.
 - 배포 시 `ncc`로 번들된 `dist/` 산출물을 함께 커밋하는 방식을 사용합니다.

@@ -26,7 +26,7 @@
       <p class="tagline">Sends notifications on push events with time-range, batching, and quality-score options.</p>
       <div class="code-block">
         <button class="copy-btn" type="button" data-copied-label="Copied!">Copy</button>
-        <pre><code>uses: developjik/notify-action-hub/notify-on-push@v1</code></pre>
+        <pre><code>uses: developjik/notify-action-hub/notify-on-push@v2</code></pre>
       </div>
       <p class="hero-note">Copy the snippet above and paste it into the <code>uses:</code> of your workflow.</p>
       <div class="hero-badges">
@@ -91,14 +91,14 @@ jobs:
     steps:
       - name: Notify on Push
         id: notify
-        uses: developjik/notify-action-hub/notify-on-push@v1
+        uses: developjik/notify-action-hub/notify-on-push@v2
         with:
           slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}</code></pre></div>
       <h3>Advanced example (time range + minimum commits)</h3>
 <div class="code-block"><button class="copy-btn" type="button" data-copied-label="Copied!">Copy</button><pre><code># Only notify during UTC night hours, with at least 5 commits
 - name: Notify on Push
   id: notify
-  uses: developjik/notify-action-hub/notify-on-push@v1
+  uses: developjik/notify-action-hub/notify-on-push@v2
   with:
     slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
     notify_time_range: '23:00-06:00'

@@ -22,7 +22,7 @@ jobs:
     steps:
       - name: Send Failure Notification
         id: notify
-        uses: developjik/notify-action-hub/notify-on-failure@v1
+        uses: developjik/notify-action-hub/notify-on-failure@v2
         with:
           slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
           discord_webhook_url: ${{ secrets.DISCORD_WEBHOOK_URL }}

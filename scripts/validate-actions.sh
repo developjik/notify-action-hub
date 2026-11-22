@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # notify-* 액션 메타데이터 통합 검증 스크립트
 # 검사 항목:
-#   1) action.yml 표준 (runs.using node20 / runs.main dist/index.js / branding)
+#   1) action.yml 표준 (runs.using node24 / runs.main dist/index.js / branding)
 #   2) dist/index.js 번들 존재
-#   3) package.json 교차검사 (main = dist/index.js, engines.node = >=20)
+#   3) package.json 교차검사 (main = dist/index.js, engines.node = >=24)
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -29,7 +29,7 @@ for file in "${action_files[@]}"; do
 
   # 1) action.yml 표준 검사
   grep -Eq "^runs:" "$file" || { echo "[ERROR] $file: missing runs block" >&2; fail=1; }
-  grep -Eq "^[[:space:]]+using:[[:space:]]*'node20'" "$file" || { echo "[ERROR] $file: runs.using must be 'node20'" >&2; fail=1; }
+  grep -Eq "^[[:space:]]+using:[[:space:]]*'node24'" "$file" || { echo "[ERROR] $file: runs.using must be 'node24'" >&2; fail=1; }
   grep -Eq "^[[:space:]]+main:[[:space:]]*'dist/index.js'" "$file" || { echo "[ERROR] $file: runs.main must be 'dist/index.js'" >&2; fail=1; }
   grep -Eq "^branding:" "$file" || { echo "[ERROR] $file: missing branding block" >&2; fail=1; }
 
@@ -54,8 +54,8 @@ for file in "${action_files[@]}"; do
     fail=1
   fi
 
-  if [ "$package_engine" != ">=20" ]; then
-    echo "[ERROR] $package_json: engines.node must be >=20 (found: ${package_engine:-<missing>})" >&2
+  if [ "$package_engine" != ">=24" ]; then
+    echo "[ERROR] $package_json: engines.node must be >=24 (found: ${package_engine:-<missing>})" >&2
     fail=1
   fi
 done

@@ -31,7 +31,7 @@ jobs:
     steps:
       - name: 푸시 알림 보내기
         id: notify
-        uses: developjik/notify-action-hub/notify-on-push@v1
+        uses: developjik/notify-action-hub/notify-on-push@v2
         with:
           slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
 ```
@@ -78,7 +78,7 @@ UTC 야간 시간대에만, 커밋 5개 이상일 때만 알림을 보내는 조
 ```yaml
 - name: 푸시 알림 보내기
   id: notify
-  uses: developjik/notify-action-hub/notify-on-push@v1
+  uses: developjik/notify-action-hub/notify-on-push@v2
   with:
     slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
     # UTC 기준 야간 시간대에만 알림 (자정을 걸치는 범위 지원)
@@ -123,7 +123,7 @@ jobs:
 
       - name: 푸시 알림 보내기
         id: notify
-        uses: developjik/notify-action-hub/notify-on-push@v1
+        uses: developjik/notify-action-hub/notify-on-push@v2
         with:
           slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
           batch_interval: '30'

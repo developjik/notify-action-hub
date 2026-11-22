@@ -26,7 +26,7 @@
       <div class="hero-badges">
         <span class="pill">7 event actions</span>
         <span class="pill">3 platforms</span>
-        <span class="pill">node20 runtime</span>
+        <span class="pill">node24 runtime</span>
         <span class="pill">MIT License</span>
       </div>
     </div>
@@ -74,7 +74,7 @@ jobs:
     steps:
       - name: Send Issue Notification
         id: notify
-        uses: developjik/notify-action-hub/notify-on-issue@v1
+        uses: developjik/notify-action-hub/notify-on-issue@v2
         with:
           slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
           discord_webhook_url: ${{ secrets.DISCORD_WEBHOOK_URL }}

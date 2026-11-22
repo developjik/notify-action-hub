@@ -18,7 +18,7 @@ A collection of GitHub Actions for sending notifications about GitHub events to 
 
 ## 🧱 Technical Standards
 
-- All actions run on `runs.using: node20`.
+- All actions run on `runs.using: node24`.
 - Execution entry points in `action.yml` are standardized to `dist/index.js`.
 - The repository root is an npm workspace (`common` + `notify-on-*`) with a single root `package-lock.json`.
 - Release artifacts use `ncc` bundles and commit generated `dist/` output.

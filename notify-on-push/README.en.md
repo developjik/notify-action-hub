@@ -31,7 +31,7 @@ jobs:
     steps:
       - name: Notify on Push
         id: notify
-        uses: developjik/notify-action-hub/notify-on-push@v1
+        uses: developjik/notify-action-hub/notify-on-push@v2
         with:
           slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
 ```
@@ -79,7 +79,7 @@ Send notifications only during UTC night hours, and only when there are 5 or mor
 ```yaml
 - name: Notify on Push
   id: notify
-  uses: developjik/notify-action-hub/notify-on-push@v1
+  uses: developjik/notify-action-hub/notify-on-push@v2
   with:
     slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
     # Only notify during UTC night hours (midnight-crossing range supported)
@@ -124,7 +124,7 @@ jobs:
 
       - name: Notify on Push
         id: notify
-        uses: developjik/notify-action-hub/notify-on-push@v1
+        uses: developjik/notify-action-hub/notify-on-push@v2
         with:
           slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
           batch_interval: '30'

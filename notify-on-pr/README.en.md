@@ -19,7 +19,7 @@ jobs:
     steps:
       - name: Send PR Notification
         id: notify
-        uses: developjik/notify-action-hub/notify-on-pr@v1
+        uses: developjik/notify-action-hub/notify-on-pr@v2
         with:
           slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
           discord_webhook_url: ${{ secrets.DISCORD_WEBHOOK_URL }}

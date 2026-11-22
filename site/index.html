@@ -26,7 +26,7 @@
       <div class="hero-badges">
         <span class="pill">7개 이벤트 액션</span>
         <span class="pill">3개 알림 플랫폼</span>
-        <span class="pill">node20 런타임</span>
+        <span class="pill">node24 런타임</span>
         <span class="pill">MIT License</span>
       </div>
     </div>
@@ -71,7 +71,7 @@ jobs:
     steps:
       - name: 이슈 알림 보내기
         id: notify
-        uses: developjik/notify-action-hub/notify-on-issue@v1
+        uses: developjik/notify-action-hub/notify-on-issue@v2
         with:
           slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
           discord_webhook_url: ${{ secrets.DISCORD_WEBHOOK_URL }}

@@ -26,7 +26,7 @@
       <p class="tagline">Sends notifications when a GitHub Actions workflow fails.</p>
       <div class="code-block">
         <button class="copy-btn" type="button" data-copied-label="Copied!">Copy</button>
-        <pre><code>uses: developjik/notify-action-hub/notify-on-failure@v1</code></pre>
+        <pre><code>uses: developjik/notify-action-hub/notify-on-failure@v2</code></pre>
       </div>
       <p class="hero-note">Copy the snippet above and paste it into the <code>uses:</code> of your workflow.</p>
       <div class="hero-badges">
@@ -89,7 +89,7 @@ jobs:
     steps:
       - name: Send Failure Notification
         id: notify
-        uses: developjik/notify-action-hub/notify-on-failure@v1
+        uses: developjik/notify-action-hub/notify-on-failure@v2
         with:
           slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
           discord_webhook_url: ${{ secrets.DISCORD_WEBHOOK_URL }}

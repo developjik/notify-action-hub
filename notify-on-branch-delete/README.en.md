@@ -20,7 +20,7 @@ jobs:
     steps:
       - name: Send branch delete notification
         id: notify
-        uses: developjik/notify-action-hub/notify-on-branch-delete@v1
+        uses: developjik/notify-action-hub/notify-on-branch-delete@v2
         with:
           slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
           discord_webhook_url: ${{ secrets.DISCORD_WEBHOOK_URL }}
